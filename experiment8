@@ -1,0 +1,361 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_LEN 10
+int i,j,k;
+typedef struct student//定义结构体
+{
+    char name[MAX_LEN];
+    long number;
+    int score[7];
+    int order;
+}STU;
+
+/****************************************/
+void Swap(STU *p1,STU *p2)//交换结构体
+{
+    STU temp;
+    temp = *p1;
+    *p1 = *p2;
+    *p2 = temp;
+}
+/****************************************/
+ int Descending(int a,int b)//降序
+ {
+     return a<b;
+ }
+
+int Ascending(int a,int b)//升序
+{
+    return a>b;
+}
+
+/**********************************/
+//读取数据，并计算每位学生总分。
+void ReadData(STU stu[],int m)
+{
+    printf("please input the name of the student:");
+    gets(stu[i].name);
+    printf("please input the number of the student:");
+    scanf("%ld",&(stu[i].number));
+    printf("please input the score of the student(P.S.%d subject):\n",m);
+    for(j=0;j<m;j++)
+    {
+        scanf("%d",&(stu[i].score[j]));
+        stu[i].score[m] += stu[i].score[j];
+    }
+    stu[i].order = i+1;
+    while(getchar()!='\n');
+
+}
+/***********************************************/
+//计算每科总分。
+void Sum(STU stu[],int sum[],int n,int m)
+{
+    for(i=0;i<m;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            sum[i] += stu[j].score[i];
+        }
+    }
+}
+/***********************************************/
+//按学生总分进行排序
+void SortByTotal(STU stu[],int n,int m,int (*compare)(int a,int b))
+{
+    for(i=0;i<n-1;i++)
+    {
+        k = i;
+        for(j=i+1;j<n;j++)
+        {
+            if((*compare)(stu[k].score[m],stu[j].score[m]))
+                k = j;
+            else;
+        }
+        Swap(&stu[i],&stu[k]);
+        stu[i].order = i+1;
+    }
+    stu[n-1].order = n;
+}
+//按学生学号进行升序排列
+void SortByNumber(STU stu[],int n)
+{
+    for(i=0;i<n-1;i++)
+    {
+        k = i;
+        for(j=i+1;j<n;j++)
+        {
+            if(stu[k].number>stu[j].number)
+               k = j;
+            else;
+        }
+        Swap(&stu[i],&stu[k]);
+    }
+}
+//按学生名字排序
+void SortByName(STU stu[],int n)
+{
+    for(i=0;i<n-1;i++)
+    {
+        k = i;
+        for(j=i+1;j<n;j++)
+        {
+            if(strcmp(stu[k].name,stu[j].name)>0)
+                k = j;
+            else;
+        }
+        Swap(&stu[i],&stu[k]);
+    }
+}
+
+
+/*******************************************************/
+//由学号找到学生信息
+int SearchByNum(STU stu[],int n,long tempnum)
+{
+    i = 0;
+    while(i<n)
+    {
+        if(tempnum==stu[i].number)
+            break;
+        else
+            i++;
+    }
+    if(i>=n)
+        return -1;//如果输入错误信息则返回负值
+    else
+        return i;
+}
+//由名字找到学生信息
+int SearchByName(STU stu[],int n,char tempname[])
+{
+     i = 0;
+    while(i<n)
+    {
+        if(strcmp(stu[i].name,tempname)==0)
+            break;
+        else
+            i++;
+    }
+    if(i>=n)
+        return -1;//如果输入错误信息则返回负值
+    else
+        return i;
+}
+
+/*****************************************************************/
+//记录每科各等级人数
+void Grade(int grade[][5],STU stu[],int n,int m)
+{
+    for(i=0;i<m;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            if(stu[j].score[i]<=100&&stu[j].score[i]>=90)
+                grade[i][0]++;
+            else if(stu[j].score[i]<90&&stu[j].score[i]>=80)
+                grade[i][1]++;
+            else if(stu[j].score[i]<80&&stu[j].score[i]>=70)
+                grade[i][2]++;
+            else if(stu[j].score[i]<70&&stu[j].score[i]>=60)
+                grade[i][3]++;
+            else
+                grade[i][4]++;
+        }
+    }
+}
+
+
+/******************************************************************/
+/******************************************************************/
+
+int main(void)
+{
+    STU stu[30];
+    long tempnum;
+    char tempname[MAX_LEN];
+    int temporder;
+    int sum[6]={0};
+    int grade[6][5]={0};
+    int n,m;
+    int choice = 1,count = 0;
+
+
+    printf("please input the amount of the students:");
+    scanf("%d",&n);
+    printf("please input the amount of the subject:");
+    scanf("%d",&m);
+
+
+    printf("1.Input record\n");
+    printf("2.Calculate total and average score of every course\n");
+    printf("3.Calculate total and average score of every student\n");
+    printf("4.Sort in descending order by total score\n");
+    printf("5.Sort in ascending order by total score\n");
+    printf("6.Sort in ascending order by number\n");
+    printf("7.Sort in dictionary order by name\n");
+    printf("8.Search by number\n");
+    printf("9.Search by name\n");
+    printf("10.Statistic analysis for every course\n");
+    printf("11.List record\n");
+    printf("0.Exit\n");
+    printf("\n");
+    printf("********************************************\n");
+
+
+    while(choice)
+    {
+        printf("\n");
+        printf("Please input your choice:");
+        scanf("%d",&choice);
+        getchar();
+        count++;
+
+
+        if(choice!=1&&count==1&&choice!=0)                //确保用户先录入学生成绩
+            printf("Error!Please choose 1 first.\n");
+
+
+        else
+        {
+            switch(choice)
+            {
+                case 1:
+                    for(i=0;i<n;i++)
+                    {
+                          printf("Please input the data of No.%d student.\n",i+1);
+                          stu[i].score[m] = 0;
+                          ReadData(stu,m);
+                    }
+                    break;
+                case 2:
+                    Sum(stu,sum,n,m);
+                    printf("********\t TOTAL\t AVERAGE\n");
+                    for(i=0;i<m;i++)
+                    {
+                        printf("Subject%d\t %d\t %f\n",i+1,sum[i],(float)sum[i]/n);
+                    }
+                    break;
+                case 3:
+                    printf("NAME\t TOTAL\t AVARAGE\n");
+                    for(i=0;i<n;i++)
+                    {
+                       printf("%s\t %d\t %f\n",stu[i].name,stu[i].score[m],(float)stu[i].score[m]/m);
+
+                    }
+                    break;
+                case 4:
+                    SortByTotal(stu,n,m,Descending);
+                    printf("order\t number\t\t name\t total\n");
+                    for(i=0;i<n;i++)
+                    {
+                        printf("No.%d\t %9ld\t %s\t %d\n",stu[i].order,stu[i].number,stu[i].name,stu[i].score[m]);
+
+                    }
+                    break;
+                case 5:
+                    SortByTotal(stu,n,m,Ascending);
+                    printf("order\t number\t\t name\t total\n");
+                    for(i=0;i<n;i++)
+                    {
+                        printf("No.%d\t %9ld\t %s\t %d\n",stu[i].order,stu[i].number,stu[i].name,stu[i].score[m]);
+
+                    }
+                    break;
+                case 6:
+                    SortByTotal(stu,n,m,Descending);
+                    SortByNumber(stu,n);
+                    printf("number\t\t name\t order\t total\n");
+                    for(i=0;i<n;i++)
+                    {
+                        printf("%9ld\t %s\t No.%d\t %d\n",stu[i].number,stu[i].name,stu[i].order,stu[i].score[m]);
+
+                    }
+                    break;
+                case 7:
+                    SortByTotal(stu,n,m,Descending);
+                    SortByName(stu,n);
+                    printf("name\t number\t\t order\t total\n");
+                    for(i=0;i<n;i++)
+                    {
+                        printf("%s\t %9ld\t No.%d\t %d\n",stu[i].name,stu[i].number,stu[i].order,stu[i].score[m]);
+
+                    }
+                    break;
+                case 8:
+                    SortByTotal(stu,n,m,Descending);
+                    printf("Please input the number of the student you want search:");
+                    scanf("%ld",&tempnum);
+                    temporder = SearchByNum(stu,n,tempnum);
+                    if(temporder<0)
+                        printf("The number you input is wrong!Try again.\n");
+                    else
+                    {
+                         printf("\n");
+                         printf("number\t\t name\t order\t total\n");
+                         printf("%9ld\t %s\t %d\t %d\n",stu[temporder].number,stu[temporder].name,stu[temporder].order,stu[temporder].score[m]);
+                    }
+
+                    break;
+                case 9:
+                     SortByTotal(stu,n,m,Descending);
+                     printf("Please input the name of the student you want search:");
+                     gets(tempname);
+                     temporder = SearchByName(stu,n,tempname);
+                     if(temporder<0)
+                        printf("The name you input is wrong!Try again.\n");
+                    else
+                    {
+                         printf("\n");
+                         printf("name\t number\t\t order\t total\n");
+                         printf("%s\t %9ld\t %d\t %d\n",stu[temporder].name,stu[temporder].number,stu[temporder].order,stu[temporder].score[m]);
+                    }
+                    break;
+                case 10:
+                    Grade(grade,stu,n,m);
+                    for(i=0;i<m;i++)
+                    {
+                        printf("Subject%d\n",i+1);
+                        printf("Grade\t Number\t Rate\n");
+                        for(j=0;j<5;j++)
+                        {
+                            printf("gradeNo.%d\t %d\t %.2f%%\n",j+1,grade[i][j],(float)grade[i][j]*100/n);
+                        }
+                        printf("*******\n");
+                    }
+                    break;
+                case 11:
+                    SortByTotal(stu,n,m,Descending);
+                    printf("Number\t\t Name\t ");
+                    for(i=0;i<m;i++)
+                    {
+                        printf("Subject%d\t ",i+1);
+                    }
+                    printf("Total\t Average\n");
+                    for(i=0;i<n;i++)
+                    {
+                        printf("%9ld\t %s\t",stu[i].number,stu[i].name);
+                        for(j=0;j<m;j++)
+                        {
+                            printf("%9d\t ",stu[i].score[j]);
+                        }
+                        printf("%5d\t %6.2f\n",stu[i].score[m],(float)stu[i].score[m]/m);
+                    }
+                    break;
+                case 0:
+                    break;
+                default:
+                    printf("Error!Please input a number from 0~1.\n");
+                    printf("\n");
+
+            }
+        }
+    }
+
+
+  printf("\n");
+  system("pause");
+  return 0;
+}
+
