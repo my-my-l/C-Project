@@ -1,0 +1,169 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#define INT 0
+#define FLT 1
+#define N 20
+
+typedef struct node
+{
+    int type;
+    union
+    {
+        int ival;
+        double dval;
+    }dat;
+}NodeType;
+
+
+typedef struct stack
+{
+    int top;
+    NodeType data[N];
+}STACK;
+
+int JudgeType(char *word)
+{
+    int i = 0;
+    int flag = INT;
+    while(word[i]!='\0')
+    {
+        if(word[i]=='.')
+        {
+            flag = FLT;
+            break;
+        }
+        i++;
+    }
+    return flag;
+}
+
+void Push(STACK *stack,NodeType *d)
+{
+    stack->data[stack->top] = *d;//OK?
+    stack->top ++;
+}
+
+void Pop(STACK *stack,NodeType *d)
+{
+    stack->top --;
+    *d = stack->data[stack->top];
+
+}
+int OpInt(int ival1,int ival2,char op)
+{
+    int temp;
+
+    switch(op)
+    {
+        case '+':
+           temp = ival1+ival2;
+           break;
+        case '-':
+           temp = ival1-ival2;
+           break;
+        case '*':
+           temp = ival1*ival2;
+           break;
+        case '/':
+           temp = ival1/ival2;
+           break;
+
+    }
+    return temp;
+}
+double OpDouble(double dval1,double dval2,char op)
+{
+    double temp;
+
+    switch(op)
+    {
+        case '+':
+            temp = dval1+dval2;
+            break;
+        case '-':
+            temp = dval1-dval2;
+            break;
+        case '*':
+            temp = dval1*dval2;
+            break;
+        case '/':
+            temp = dval1/dval2;
+            break;
+    }
+    return temp;
+}
+
+void Opdata(NodeType *d1,NodeType *d2,NodeType *d3,char op)
+{
+    if(d1->type&&d2->type)
+    {
+        d3->dat.dval = OpDouble(d1->dat.dval,d2->dat.dval,op);
+        d3->type = FLT;
+    }
+    else if(!(d1->type||d2->type))
+    {
+        d3->dat.ival = OpInt(d1->dat.ival,d2->dat.ival,op);
+        d3->type = INT;
+    }
+    else if((d1->type==1)&&(d2->type==0))
+    {
+        d3->dat.dval = OpDouble(d1->dat.dval,(double)(d2->dat.ival),op);
+        d3->type = FLT;
+    }
+    else if((d1->type==0)&&(d2->type==1))
+    {
+        d3->dat.dval = OpDouble((double)(d1->dat.ival),d2->dat.dval,op);
+        d3->type = FLT;
+    }
+}
+
+
+int main(void)
+{
+    char word[N];
+    STACK stack;
+    stack.top = 0;
+    NodeType d1,d2,d3;
+    printf("输入逆波兰表达式（以空格为分割符 以#结束）:\n");
+    while(scanf("%s",word)==1&&word[0]!='#')
+    {
+
+        if(isdigit(word[0]))
+        {
+            d1.type = JudgeType(word);
+            if(d1.type)
+                d1.dat.dval = atof(word);
+            else
+                d1.dat.ival = atoi(word);
+
+
+            Push(&stack,&d1);
+
+        }
+        else
+        {
+            Pop(&stack,&d1);
+            Pop(&stack,&d2);
+            Opdata(&d2,&d1,&d3,word[0]);
+            Push(&stack,&d3);
+        }
+
+    }
+
+    printf("Result is ");
+    if(stack.data[stack.top-1].type)
+    {
+        printf("%lf\n",stack.data[stack.top-1].dat.dval);
+    }
+    else
+    {
+        printf("%d\n",stack.data[stack.top-1].dat.ival);
+    }
+
+    printf("\n");
+    system("pause");
+    return 0;
+
+}
